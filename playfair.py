@@ -1,3 +1,5 @@
+# Use the Playfair cipher to encipher "The key is hidden under the door pad". The secret key can be made by filling the first and
+# part of the second row with the word "GUIDANCE" and filling the rest of the matrix with the rest of the alphabet.
 def toLowerCase(text):
     return text.lower()
 
@@ -15,7 +17,6 @@ def Diagraph(text):
     group = 0
     for i in range(2, len(text), 2):
         Diagraph.append(text[group:i])
-
         group = i
     Diagraph.append(text[group:])
     return Diagraph
