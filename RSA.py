@@ -1,3 +1,6 @@
+#Encrypt the message "Cryptographic Protocols" using the RSA public key (n, e) where n = 323 and e = 5. Decrypt the ciphertext with the
+#private key (n, d) where d = 173 to confirm the original message
+
 import random
 from math import gcd
 
@@ -7,7 +10,6 @@ def mod_inverse(e, phi):
             return (b, 0, 1)
         g, y, x = egcd(b % a, a)
         return (g, x - (b // a) * y, y)
-    
     g, x, y = egcd(e, phi)
     if g != 1:
         raise Exception('Modular inverse does not exist')
@@ -22,16 +24,12 @@ def generate_rsa_keys():
     q = 53
     n = p * q
     phi = (p - 1) * (q - 1)
-
     e = 17
     if gcd(e, phi) != 1:
         raise ValueError("e and phi are not coprime!")
-
     d = mod_inverse(e, phi)
-
     public_key = (e, n)
     private_key = (d, n)
-
     return public_key, private_key
 
 def rsa_encrypt(plaintext, public_key):
