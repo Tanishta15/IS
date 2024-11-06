@@ -1,44 +1,43 @@
-keyMatrix = [[0] * 3 for i in range(3)]
- 
-messageVector = [[0] for i in range(3)]
- 
-cipherMatrix = [[0] for i in range(3)]
- 
-def getKeyMatrix(key):
-    k = 0
-    for i in range(3):
-        for j in range(3):
-            keyMatrix[i][j] = ord(key[k]) % 65
-            k += 1
- 
-def encrypt(messageVector):
-    for i in range(3):
-        for j in range(1):
-            cipherMatrix[i][j] = 0
-            for x in range(3):
-                cipherMatrix[i][j] += (keyMatrix[i][x] *
-                                       messageVector[x][j])
-            cipherMatrix[i][j] = cipherMatrix[i][j] % 26
- 
-def HillCipher(message, key):
- 
-    getKeyMatrix(key)
+import numpy as np
 
-    for i in range(3):
-        messageVector[i][0] = ord(message[i]) % 65
+def text_to_numbers(text):
+    text = text.replace(" ", "").upper()
+    return [ord(char) - ord('A') for char in text]
 
-    encrypt(messageVector)
+def numbers_to_text(numbers):
+    return ''.join([chr(num + ord('A')) for num in numbers])
 
-    CipherText = []
-    for i in range(3):
-        CipherText.append(chr(cipherMatrix[i][0] + 65))
- 
-    print("Ciphertext: ", "".join(CipherText))
- 
-def main():
-    message = "ACT"
-    key = "GYBNQKURP"
-    HillCipher(message, key)
+def hill_cipher_encrypt(plaintext, key):
+    numbers = text_to_numbers(plaintext)
+    if len(numbers) % 2 != 0: # Ensure the length is even by padding with 'X'
+        numbers.append(ord('X') - ord('A'))
 
-if __name__ == "__main__":
-    main()
+    encrypted_numbers = []  # Split into 2x1 column vectors
+    for i in range(0, len(numbers), 2):
+        vector = np.array([[numbers[i]], [numbers[i+1]]])
+        encrypted_vector = np.dot(key, vector) % 26
+        encrypted_numbers.extend(encrypted_vector.flatten())
+    return numbers_to_text(encrypted_numbers)
+
+def hill_cipher_decrypt(ciphertext, key):
+    numbers = text_to_numbers(ciphertext)
+    determinant = int(np.round(np.linalg.det(key))) % 26 # Compute the inverse of the key matrix modulo 26
+    determinant_inv = pow(determinant, -1, 26)
+    adjugate = np.array([[key[1, 1], -key[0, 1]], [-key[1, 0], key[0, 0]]])
+    key_inv = (determinant_inv * adjugate) % 26
+
+    decrypted_numbers = []
+    for i in range(0, len(numbers), 2):
+        vector = np.array([[numbers[i]], [numbers[i+1]]])
+        decrypted_vector = np.dot(key_inv, vector) % 26
+        decrypted_numbers.extend(decrypted_vector.flatten())
+    return numbers_to_text(decrypted_numbers)
+
+key_matrix = np.array([[3, 3], [2, 7]])
+message = "We live in an insecure world"
+
+encrypted_message = hill_cipher_encrypt(message, key_matrix)
+print(f"Encrypted message: {encrypted_message}")
+
+decrypted_message = hill_cipher_decrypt(encrypted_message, key_matrix)
+print(f"Decrypted message: {decrypted_message}")
