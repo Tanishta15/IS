@@ -1,17 +1,23 @@
-def encrypt(text,s):
-    result=""
-    for i in range(len(text)):
-        char=text[i]
-        if char.isupper():
-            char = chr((ord(char) - 65 * s) % 26 + 65)
+def encrypt(plaintext, key):
+    plaintext = plaintext.replace(" ", "").upper()
+    ciphertext = ""
+    for char in plaintext:
+        encrypted = chr(((ord(char) - ord('A') + key) % 26) + ord('A'))
+        ciphertext += encrypted
+    return ciphertext
 
-            result=result+char
-        else:
-            char= chr((ord(char) - 95 + s) % 26 + 95)
+def decrypt(ciphertext, key):
+    plaintext = ""
+    for char in ciphertext:
+        decrypted_char = chr(((ord(char) - ord('A') - key) % 26) + ord('A'))
+        plaintext += decrypted_char
+    return plaintext
 
-            result=result+char
-    return result
-text=input("enter a string:\n")
-a=int(input("enter the key:\n"))
-ans=encrypt(text,a)
-print(ans)
+message = "I am learning information security"
+key = 20
+
+encrypted= encrypt(message, key)
+print(f"Encrypted message: {encrypted}")
+
+decrypted = decrypt(encrypted, key)
+print(f"Decrypted message: {decrypted}")
